@@ -23,7 +23,7 @@ def butter_filter(data, cutoff, fs, btype, order=4):
 def plot_psd(data, fs, eixo):
     f, Pxx = signal.welch(data, fs=fs, nperseg=1024)
     fig, ax = plt.subplots(figsize=(10, 3))
-    ax.semilogy(f, Pxx, color='green')
+    ax.plot(f, Pxx, color='green')
     ax.set_xlabel('Frequência (Hz)')
     ax.set_ylabel('Densidade espectral')
     ax.set_title(f'Densidade espectral de potência - Eixo {eixo}')
