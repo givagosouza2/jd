@@ -63,9 +63,7 @@ if uploaded_file is not None:
         low_x = butter_filter(detrended_x, 2, fs, 'low')
         high_x = butter_filter(detrended_x, 2, fs, 'high')
 
-        # Ciclos de movimento
-        peaks, _ = find_peaks(low_x, height = distance=fs/2)
-        num_cycles = len(peaks)
+        
 
         # PSD + análise espectral eixo X
         low_lim = st.number_input('Selecione o limite inferior da janela de interesse',value=0)
