@@ -64,11 +64,13 @@ if uploaded_file is not None:
         high_x = butter_filter(detrended_x, 2, fs, 'high')
 
         # Ciclos de movimento
-        peaks, _ = find_peaks(low_x, distance=fs/2)
+        peaks, _ = find_peaks(low_x, height = distance=fs/2)
         num_cycles = len(peaks)
 
         # PSD + análise espectral eixo X
-        fig_psd, f, Pxx = plot_psd(detrended_x, fs, 'X')
+        low_lim = st.number_input('Selecione o limite inferior da janela de interesse',value=0)
+        high_lim = st.number_input('Selecione o limite superior da janela de interesse',value=0)
+        fig_psd, f, Pxx = plot_psd(detrended_x[low_lim:high_lim], fs, 'X')
         st.pyplot(fig_psd)
 
         power_movement = band_power(f, Pxx, 0.3, 1.5)
@@ -78,11 +80,11 @@ if uploaded_file is not None:
         # Gráficos temporais
         fig, axs = plt.subplots(3, 1, figsize=(10, 6), sharex=True)
         axs[0].plot(t_interp, detrended_x, color='black')
+        axs[0].plot([t_interp[low_lim],t_interp[low_lim]],[-4, 4],'--b')
+        axs[0].plot([t_interp[high_lim],t_interp[high_lim]],[-4, 4],'--b')
         axs[0].set_ylabel("Original")
-        axs[1].plot(t_interp, low_x, color='blue')
-        axs[1].plot(t_interp[peaks], low_x[peaks], "rx", label="Ciclos detectados")
-        axs[1].set_ylabel("Passa-Baixa 2 Hz")
-        axs[1].legend()
+        axs[1].plot(t_interp, low_x, color='blue')        
+        axs[1].set_ylabel("Passa-Baixa 2 Hz")        
         axs[2].plot(t_interp, high_x, color='red')
         axs[2].set_ylabel("Passa-Alta 2 Hz")
         axs[2].set_xlabel("Tempo (s)")
