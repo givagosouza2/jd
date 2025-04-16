@@ -90,7 +90,7 @@ if uploaded_file is not None:
 
         # Resultados
         st.subheader("Análise Quantitativa - Eixo X")
-        st.markdown(f"- **Número estimado de ciclos (flexão-extensão)**: `{num_cycles}`")
+        
         st.markdown(f"- **Potência 0.3–1.5 Hz (movimento voluntário)**: `{power_movement:.3f}`")
         st.markdown(f"- **Potência 2–6 Hz (rigidez roda dentada)**: `{power_rigidity:.3f}`")
         st.markdown(f"- **Índice de rigidez relativa**: `{rigidity_index:.3f}`")
