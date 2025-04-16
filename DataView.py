@@ -71,8 +71,8 @@ if uploaded_file is not None:
         fig_psd, f, Pxx = plot_psd(detrended_x[low_lim:high_lim], fs, 'X')
         st.pyplot(fig_psd)
 
-        power_movement = band_power(f, Pxx, 0.3, 1.5)
-        power_rigidity = band_power(f, Pxx, 2.0, 6.0)
+        power_movement = (10**5)*band_power(f, Pxx, 0.3, 1.5)
+        power_rigidity = (10**5)*band_power(f, Pxx, 2.0, 6.0)
         rigidity_index = power_rigidity / power_movement if power_movement > 0 else np.nan
 
         # Gráficos temporais
