@@ -2,26 +2,29 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from scipy import signal
-import io
 import matplotlib.pyplot as plt
 
 st.set_page_config(layout='wide')
 st.title("Análise de Aceleração 3D")
-
 
 # Upload do arquivo
 uploaded_file = st.file_uploader(
     "Faça upload de um arquivo .txt com cabeçalho e 4 colunas (tempo em ms, acc_x, acc_y, acc_z)", type=["txt", "csv"]
 )
 
+# Funções de filtro
+def butter_filter(data, cutoff, fs, btype, order=4):
+    nyq = 0.5 * fs
+    normal_cutoff = cutoff / nyq
+    b, a = signal.butter(order, normal_cutoff, btype=btype)
+    return signal.filtfilt(b, a, data)
+
 if uploaded_file is not None:
     # Leitura do arquivo e ajuste de separador
     df = pd.read_csv(uploaded_file, sep=None, engine='python')
     df.columns = df.columns.str.strip()
 
-    # Verifica se tem ao menos 4 colunas
     if df.shape[1] >= 4:
-        # Converte tempo para segundos (de ms para s)
         tempo = df.iloc[:, 0].values / 1000.0
         acc_x = df.iloc[:, 1].values
         acc_y = df.iloc[:, 2].values
@@ -41,22 +44,21 @@ if uploaded_file is not None:
         detrended_y = signal.detrend(interp_y)
         detrended_z = signal.detrend(interp_z)
 
-        c1, c2, c3 = st.columns(3)
-        with c1:
-            fig, ax = plt.subplots(figsize=(10, 4))
-            ax.plot(t_interp, detrended_x, color='black')
-            ax.set_xlabel("Tempo (s)")
-            ax.set_ylabel("Aceleração")
-            st.pyplot(fig)
-        with c2:
-            fig, ax = plt.subplots(figsize=(10, 4))
-            ax.plot(t_interp, detrended_y, color='black')
-            ax.set_xlabel("Tempo (s)")
-            ax.set_ylabel("Aceleração")
-            st.pyplot(fig)
-        with c3:
-            fig, ax = plt.subplots(figsize=(10, 4))
-            ax.plot(t_interp, detrended_z, color='black')
-            ax.set_xlabel("Tempo (s)")
-            ax.set_ylabel("Aceleração")
-            st.pyplot(fig)
+        # Filtros
+        low_x = butter_filter(detrended_x, 2, fs, 'low')
+        high_x = butter_filter(detrended_x, 2, fs, 'high')
+
+        low_y = butter_filter(detrended_y, 2, fs, 'low')
+        high_y = butter_filter(detrended_y, 2, fs, 'high')
+
+        low_z = butter_filter(detrended_z, 2, fs, 'low')
+        high_z = butter_filter(detrended_z, 2, fs, 'high')
+
+        for eixo, original, low, high in zip(['X', 'Y', 'Z'],
+                                             [detrended_x, detrended_y, detrended_z],
+                                             [low_x, low_y, low_z],
+                                             [high_x, high_y, high_z]):
+            st.subheader(f"Eixo {eixo}")
+            fig, axs = plt.subplots(3, 1, figsize=(10, 6), sharex=True)
+            axs[0].plot(t_interp, original, color='black')
+            axs[0].set_ylabel("Original")
